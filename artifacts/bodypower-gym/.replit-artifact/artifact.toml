@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Bodypower Gym"
+version = "1.0.0"
+id = "artifacts/bodypower-gym"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24808
+
+[services.development]
+run = "pnpm --filter @workspace/bodypower-gym run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/bodypower-gym", "run", "build" ]
+publicDir = "artifacts/bodypower-gym/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24808"
+BASE_PATH = "/"

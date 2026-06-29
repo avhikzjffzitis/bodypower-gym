@@ -1,0 +1,662 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Bodypower Gym API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User management
+  - name: memberships
+    description: Membership plans
+  - name: bookings
+    description: Class and demo bookings
+  - name: payments
+    description: Payment processing
+  - name: admin
+    description: Admin dashboard
+  - name: stats
+    description: Statistics and analytics
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /users/profile:
+    patch:
+      operationId: updateProfile
+      tags: [users]
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/change-password:
+    post:
+      operationId: changePassword
+      tags: [users]
+      summary: Change user password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordChangeInput"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /memberships:
+    get:
+      operationId: getMemberships
+      tags: [memberships]
+      summary: Get all membership plans
+      responses:
+        "200":
+          description: Membership plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MembershipPlan"
+
+  /bookings:
+    get:
+      operationId: getBookings
+      tags: [bookings]
+      summary: Get user's bookings
+      responses:
+        "200":
+          description: User bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingInput"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get booking by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /payments:
+    get:
+      operationId: getPayments
+      tags: [payments]
+      summary: Get user payment history
+      responses:
+        "200":
+          description: Payment history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+    post:
+      operationId: createPayment
+      tags: [payments]
+      summary: Process a payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentInput"
+      responses:
+        "201":
+          description: Payment processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /stats/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get user dashboard stats
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get admin overview stats
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/users:
+    get:
+      operationId: getAdminUsers
+      tags: [admin]
+      summary: Get all users (admin)
+      responses:
+        "200":
+          description: All users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminUser"
+
+  /admin/users/{id}:
+    delete:
+      operationId: deleteAdminUser
+      tags: [admin]
+      summary: Delete a user (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /admin/bookings:
+    get:
+      operationId: getAdminBookings
+      tags: [admin]
+      summary: Get all bookings (admin)
+      responses:
+        "200":
+          description: All bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+
+  /admin/payments:
+    get:
+      operationId: getAdminPayments
+      tags: [admin]
+      summary: Get all payments (admin)
+      responses:
+        "200":
+          description: All payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Admin logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    RegisterInput:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AdminLoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+
+    User:
+      type: object
+      required: [id, name, email, role, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [user, admin]
+        membershipStatus:
+          type: ["string", "null"]
+        membershipExpiry:
+          type: ["string", "null"]
+        language:
+          type: string
+        createdAt:
+          type: string
+
+    ProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        language:
+          type: string
+
+    PasswordChangeInput:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 6
+
+    MembershipPlan:
+      type: object
+      required: [id, name, price, duration, features]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: integer
+        duration:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        popular:
+          type: boolean
+
+    BookingInput:
+      type: object
+      required: [fullName, phone, age, email, membershipType]
+      properties:
+        fullName:
+          type: string
+        phone:
+          type: string
+        age:
+          type: integer
+          minimum: 18
+          maximum: 60
+        email:
+          type: string
+        membershipType:
+          type: string
+          enum: [demo, silver, premium]
+
+    Booking:
+      type: object
+      required: [id, userId, fullName, phone, age, email, membershipType, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        fullName:
+          type: string
+        phone:
+          type: string
+        age:
+          type: integer
+        email:
+          type: string
+        membershipType:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled]
+        confirmationCode:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        payment:
+          $ref: "#/components/schemas/Payment"
+
+    PaymentInput:
+      type: object
+      required: [bookingId, amount, method]
+      properties:
+        bookingId:
+          type: integer
+        amount:
+          type: integer
+        method:
+          type: string
+          enum: [upi, credit_card, debit_card, net_banking]
+        upiId:
+          type: ["string", "null"]
+        cardNumber:
+          type: ["string", "null"]
+        cardHolder:
+          type: ["string", "null"]
+        cardExpiry:
+          type: ["string", "null"]
+        cardCvv:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+
+    Payment:
+      type: object
+      required: [id, bookingId, amount, method, status, createdAt]
+      properties:
+        id:
+          type: integer
+        bookingId:
+          type: integer
+        amount:
+          type: integer
+        method:
+          type: string
+        status:
+          type: string
+          enum: [pending, success, failed]
+        transactionId:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    DashboardStats:
+      type: object
+      required: [totalBookings, activeMembers, totalSpent, upcomingBookings]
+      properties:
+        totalBookings:
+          type: integer
+        activeMembers:
+          type: integer
+        totalSpent:
+          type: integer
+        upcomingBookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Booking"
+        recentPayments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"
+
+    AdminStats:
+      type: object
+      required: [totalUsers, totalBookings, totalRevenue, activeMemberships]
+      properties:
+        totalUsers:
+          type: integer
+        totalBookings:
+          type: integer
+        totalRevenue:
+          type: integer
+        activeMemberships:
+          type: integer
+        bookingsByType:
+          type: array
+          items:
+            $ref: "#/components/schemas/BookingTypeStat"
+        revenueByMonth:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthRevenue"
+        paymentsByMethod:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentMethodStat"
+
+    BookingTypeStat:
+      type: object
+      required: [type, count]
+      properties:
+        type:
+          type: string
+        count:
+          type: integer
+
+    MonthRevenue:
+      type: object
+      required: [month, revenue]
+      properties:
+        month:
+          type: string
+        revenue:
+          type: integer
+
+    PaymentMethodStat:
+      type: object
+      required: [method, count, total]
+      properties:
+        method:
+          type: string
+        count:
+          type: integer
+        total:
+          type: integer
+
+    AdminUser:
+      type: object
+      required: [id, name, email, role, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: string
+        membershipStatus:
+          type: ["string", "null"]
+        totalBookings:
+          type: integer
+        totalSpent:
+          type: integer
+        createdAt:
+          type: string
